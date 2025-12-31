@@ -9,7 +9,16 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { ThemeContext } from "../context/ThemeContext";
 import { AuthContext } from "../context/AuthContext";
-import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "../services/firebase";
 import { SafeAreaView } from "react-native-safe-area-context";
 export default function HomeScreen() {
@@ -18,6 +27,7 @@ export default function HomeScreen() {
   const [todos, setTodos] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [newTodo, setNewTodo] = useState("");
+  const [editingTodo, setEditingTodo] = useState(null);
   const loadTodos = async () => {
     if (!user) return;
     const snap = await getDocs(
@@ -28,15 +38,35 @@ export default function HomeScreen() {
   useEffect(() => {
     loadTodos();
   }, [user]);
-  const addTodo = async () => {
+  const saveTodo = async () => {
     if (!newTodo.trim() || !user) return;
-    await addDoc(collection(db, "todos"), {
-      title: newTodo,
-      userId: user.uid,
-      createdAt: new Date(),
-    });
+    if (editingTodo) {
+      await updateDoc(doc(db, "todos", editingTodo.id), { title: newTodo });
+    } else {
+      await addDoc(collection(db, "todos"), {
+        title: newTodo,
+        userId: user.uid,
+        createdAt: new Date(),
+      });
+    }
     setNewTodo("");
+    setEditingTodo(null);
     setModalVisible(false);
+    loadTodos();
+  };
+  const startAddTodo = () => {
+    setNewTodo("");
+    setEditingTodo(null);
+    setModalVisible(true);
+  };
+  const startEditTodo = todo => {
+    setNewTodo(todo.title);
+    setEditingTodo(todo);
+    setModalVisible(true);
+  };
+  const deleteTodo = async todoId => {
+    if (!user) return;
+    await deleteDoc(doc(db, "todos", todoId));
     loadTodos();
   };
   return (
@@ -60,7 +90,7 @@ export default function HomeScreen() {
             padding: 12,
             borderRadius: 8,
           }}
-          onPress={() => setModalVisible(true)}
+          onPress={startAddTodo}
         >
           <Text style={{ color: "#fff", textAlign: "center" }}>
             + Ajouter une tache
@@ -78,7 +108,34 @@ export default function HomeScreen() {
                 marginBottom: 10,
               }}
             >
-              <Text style={{ color: theme.text }}>{item.title}</Text>
+              <Text style={{ color: theme.text, marginBottom: 8 }}>
+                {item.title}
+              </Text>
+              <View style={{ flexDirection: "row", gap: 10 }}>
+                <TouchableOpacity
+                  onPress={() => startEditTodo(item)}
+                  style={{
+                    paddingVertical: 6,
+                    paddingHorizontal: 12,
+                    borderRadius: 6,
+                    borderWidth: 1,
+                    borderColor: theme.primary,
+                  }}
+                >
+                  <Text style={{ color: theme.primary }}>Modifier</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => deleteTodo(item.id)}
+                  style={{
+                    paddingVertical: 6,
+                    paddingHorizontal: 12,
+                    borderRadius: 6,
+                    backgroundColor: "#E53935",
+                  }}
+                >
+                  <Text style={{ color: "#fff" }}>Supprimer</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           )}
         />
@@ -99,7 +156,9 @@ export default function HomeScreen() {
               borderRadius: 10,
             }}
           >
-            <Text style={{ color: theme.text, fontSize: 18 }}>Nouvelle tache</Text>
+            <Text style={{ color: theme.text, fontSize: 18 }}>
+              {editingTodo ? "Modifier la tache" : "Nouvelle tache"}
+            </Text>
             <TextInput
               placeholder="Titre de la tache"
               value={newTodo}
@@ -114,14 +173,16 @@ export default function HomeScreen() {
               }}
             />
             <TouchableOpacity
-              onPress={addTodo}
+              onPress={saveTodo}
               style={{
                 backgroundColor: theme.primary,
                 padding: 10,
                 borderRadius: 6,
               }}
             >
-              <Text style={{ color: "#fff", textAlign: "center" }}>Ajouter</Text>
+              <Text style={{ color: "#fff", textAlign: "center" }}>
+                {editingTodo ? "Enregistrer" : "Ajouter"}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
               <Text style={{ textAlign: "center", marginTop: 10 }}>Annuler</Text>
