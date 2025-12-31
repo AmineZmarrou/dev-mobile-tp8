@@ -15,10 +15,10 @@ import { auth } from "../services/firebase";
 import { ThemeContext } from "../context/ThemeContext";
 WebBrowser.maybeCompleteAuthSession();
 const EXPO_CLIENT_ID =
-  process.env.EXPO_PUBLIC_GOOGLE_EXPO_CLIENT_ID ||
+
   process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 const ANDROID_CLIENT_ID =
-  process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID || EXPO_CLIENT_ID;
+   EXPO_CLIENT_ID;
 const WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 const isExpoGo = Constants.appOwnership === "expo";
 
