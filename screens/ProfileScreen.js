@@ -9,8 +9,23 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
       <View style={{ padding: 20 }}>
-        <Text style={{ fontSize: 24, color: theme.text }}>Profil utilisateur</Text>
-        <Text style={{ color: theme.text }}>{user?.email}</Text>
+        <Text style={{ fontSize: 24, color: theme.text, marginBottom: 12 }}>
+          Profil utilisateur
+        </Text>
+        <View
+          style={{
+            backgroundColor: theme.card,
+            borderWidth: 1,
+            borderColor: theme.border,
+            padding: 16,
+            borderRadius: 12,
+          }}
+        >
+          <Text style={{ color: theme.textMuted, marginBottom: 6 }}>
+            Email
+          </Text>
+          <Text style={{ color: theme.text }}>{user?.email}</Text>
+        </View>
       </View>
     </SafeAreaView>
   );

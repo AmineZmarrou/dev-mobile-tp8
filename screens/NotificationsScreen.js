@@ -2,11 +2,13 @@
 import { View, Text, Button, StyleSheet } from "react-native";
 import Constants from "expo-constants";
 import AppBar from "../components/AppBar";
+import { ThemeContext } from "../context/ThemeContext";
 
 const isExpoGo = Constants.appOwnership === "expo";
 
 export default function NotificationsScreen() {
   const [notifications, setNotifications] = useState(null);
+  const { theme } = React.useContext(ThemeContext);
 
   useEffect(() => {
     if (isExpoGo) {
@@ -59,18 +61,28 @@ export default function NotificationsScreen() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: theme.background }}>
       <AppBar title="Notifications" back />
       <View style={styles.container}>
-        <Text style={styles.title}>Gestion des notifications locales</Text>
+        <Text style={[styles.title, { color: theme.text }]}>
+          Gestion des notifications locales
+        </Text>
         {isExpoGo ? (
-          <Text style={styles.warning}>
+          <Text style={[styles.warning, { color: theme.danger }]}>
             Notifications are disabled in Expo Go. Use a dev build.
           </Text>
         ) : null}
-        <Button title="Demander permission" onPress={requestPermission} />
+        <Button
+          title="Demander permission"
+          color={theme.primary}
+          onPress={requestPermission}
+        />
         <View style={styles.spacer} />
-        <Button title="Notification immediate" onPress={sendTestNotification} />
+        <Button
+          title="Notification immediate"
+          color={theme.primary}
+          onPress={sendTestNotification}
+        />
         <View style={styles.spacer} />
       </View>
     </View>

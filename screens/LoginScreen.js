@@ -23,7 +23,7 @@ const WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 const isExpoGo = Constants.appOwnership === "expo";
 
 export default function LoginScreen() {
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const { theme, toggleTheme, mode } = useContext(ThemeContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -134,41 +134,49 @@ export default function LoginScreen() {
         Connexion
       </Text>
       {error !== "" && (
-        <Text style={{ color: "red", marginBottom: 10, textAlign: "center" }}>
+        <Text
+          style={{
+            color: theme.danger,
+            marginBottom: 10,
+            textAlign: "center",
+          }}
+        >
           {error}
         </Text>
       )}
       <TextInput
         placeholder="Email"
-        placeholderTextColor="#999"
+        placeholderTextColor={theme.textMuted}
         value={email}
         onChangeText={setEmail}
         style={{
           borderWidth: 1,
-          borderColor: "#ccc",
+          borderColor: theme.border,
           borderRadius: 8,
           padding: 12,
           marginBottom: 12,
+          backgroundColor: theme.inputBackground,
           color: theme.text,
         }}
       />
       <TextInput
         placeholder="Mot de passe"
-        placeholderTextColor="#999"
+        placeholderTextColor={theme.textMuted}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
         style={{
           borderWidth: 1,
-          borderColor: "#ccc",
+          borderColor: theme.border,
           borderRadius: 8,
           padding: 12,
           marginBottom: 20,
+          backgroundColor: theme.inputBackground,
           color: theme.text,
         }}
       />
       {loading ? (
-        <ActivityIndicator />
+        <ActivityIndicator color={theme.primary} />
       ) : (
         <>
           <TouchableOpacity
@@ -180,7 +188,9 @@ export default function LoginScreen() {
               marginBottom: 10,
             }}
           >
-            <Text style={{ color: "#fff", textAlign: "center" }}>Se connecter</Text>
+            <Text style={{ color: theme.primaryText, textAlign: "center" }}>
+              Se connecter
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={register}
@@ -190,6 +200,7 @@ export default function LoginScreen() {
               padding: 14,
               borderRadius: 8,
               marginBottom: 20,
+              backgroundColor: theme.surface,
             }}
           >
             <Text style={{ color: theme.primary, textAlign: "center" }}>
@@ -211,9 +222,21 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </>
       )}
-      <TouchableOpacity onPress={toggleTheme} style={{ marginTop: 30 }}>
-        <Text style={{ textAlign: "center", color: theme.primary }}>
-          Changer le theme
+      <TouchableOpacity
+        onPress={toggleTheme}
+        style={{
+          marginTop: 30,
+          alignSelf: "center",
+          borderWidth: 1,
+          borderColor: theme.border,
+          backgroundColor: theme.surface,
+          paddingVertical: 8,
+          paddingHorizontal: 14,
+          borderRadius: 999,
+        }}
+      >
+        <Text style={{ textAlign: "center", color: theme.text }}>
+          {mode === "light" ? "Mode sombre" : "Mode clair"}
         </Text>
       </TouchableOpacity>
     </View>

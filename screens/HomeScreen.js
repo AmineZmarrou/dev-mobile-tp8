@@ -22,7 +22,7 @@ import {
 import { db } from "../services/firebase";
 import { SafeAreaView } from "react-native-safe-area-context";
 export default function HomeScreen() {
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const { theme, toggleTheme, mode } = useContext(ThemeContext);
   const { user, logout } = useContext(AuthContext);
   const [todos, setTodos] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -72,17 +72,48 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
       <View style={{ padding: 16 }}>
-        <Text
-          style={{ color: theme.text, fontSize: 26, fontWeight: "bold" }}
-        >
-          Mes taches
-        </Text>
-        <TouchableOpacity onPress={toggleTheme}>
-          <Text style={{ color: theme.primary }}>Changer theme</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={logout}>
-          <Text style={{ color: "red" }}>Deconnexion</Text>
-        </TouchableOpacity>
+        <View style={{ marginBottom: 16 }}>
+          <Text style={{ color: theme.text, fontSize: 26, fontWeight: "bold" }}>
+            Mes taches
+          </Text>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginTop: 10,
+            }}
+          >
+            <TouchableOpacity
+              onPress={toggleTheme}
+              style={{
+                borderWidth: 1,
+                borderColor: theme.border,
+                backgroundColor: theme.surface,
+                paddingVertical: 6,
+                paddingHorizontal: 10,
+                borderRadius: 999,
+              }}
+            >
+              <Text style={{ color: theme.text }}>
+                {mode === "light" ? "Mode sombre" : "Mode clair"}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={logout}
+              style={{
+                borderWidth: 1,
+                borderColor: theme.danger,
+                backgroundColor: theme.surface,
+                paddingVertical: 6,
+                paddingHorizontal: 10,
+                borderRadius: 999,
+              }}
+            >
+              <Text style={{ color: theme.danger }}>Deconnexion</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
         <TouchableOpacity
           style={{
             marginVertical: 15,
@@ -92,7 +123,7 @@ export default function HomeScreen() {
           }}
           onPress={startAddTodo}
         >
-          <Text style={{ color: "#fff", textAlign: "center" }}>
+          <Text style={{ color: theme.primaryText, textAlign: "center" }}>
             + Ajouter une tache
           </Text>
         </TouchableOpacity>
@@ -103,6 +134,8 @@ export default function HomeScreen() {
             <View
               style={{
                 backgroundColor: theme.card,
+                borderWidth: 1,
+                borderColor: theme.border,
                 padding: 12,
                 borderRadius: 8,
                 marginBottom: 10,
@@ -120,6 +153,7 @@ export default function HomeScreen() {
                     borderRadius: 6,
                     borderWidth: 1,
                     borderColor: theme.primary,
+                    backgroundColor: theme.surface,
                   }}
                 >
                   <Text style={{ color: theme.primary }}>Modifier</Text>
@@ -130,7 +164,7 @@ export default function HomeScreen() {
                     paddingVertical: 6,
                     paddingHorizontal: 12,
                     borderRadius: 6,
-                    backgroundColor: "#E53935",
+                    backgroundColor: theme.danger,
                   }}
                 >
                   <Text style={{ color: "#fff" }}>Supprimer</Text>
@@ -144,16 +178,18 @@ export default function HomeScreen() {
         <View
           style={{
             flex: 1,
-            backgroundColor: "rgba(0,0,0,0.5)",
+            backgroundColor: theme.overlay,
             justifyContent: "center",
             padding: 20,
           }}
         >
           <View
             style={{
-              backgroundColor: theme.background,
+              backgroundColor: theme.surface,
               padding: 20,
               borderRadius: 10,
+              borderWidth: 1,
+              borderColor: theme.border,
             }}
           >
             <Text style={{ color: theme.text, fontSize: 18 }}>
@@ -161,14 +197,16 @@ export default function HomeScreen() {
             </Text>
             <TextInput
               placeholder="Titre de la tache"
+              placeholderTextColor={theme.textMuted}
               value={newTodo}
               onChangeText={setNewTodo}
               style={{
                 borderWidth: 1,
-                borderColor: "#ccc",
+                borderColor: theme.border,
                 marginVertical: 10,
                 padding: 10,
                 borderRadius: 6,
+                backgroundColor: theme.inputBackground,
                 color: theme.text,
               }}
             />
@@ -180,12 +218,20 @@ export default function HomeScreen() {
                 borderRadius: 6,
               }}
             >
-              <Text style={{ color: "#fff", textAlign: "center" }}>
+              <Text style={{ color: theme.primaryText, textAlign: "center" }}>
                 {editingTodo ? "Enregistrer" : "Ajouter"}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text style={{ textAlign: "center", marginTop: 10 }}>Annuler</Text>
+              <Text
+                style={{
+                  textAlign: "center",
+                  marginTop: 10,
+                  color: theme.textMuted,
+                }}
+              >
+                Annuler
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
