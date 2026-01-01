@@ -10,6 +10,7 @@ import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithCredential,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { auth } from "../services/firebase";
 import { ThemeContext } from "../context/ThemeContext";
@@ -27,6 +28,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
   const [loading, setLoading] = useState(false);
   const [request, response, promptAsync] = Google.useAuthRequest({
     clientId: isExpoGo ? EXPO_CLIENT_ID : undefined,
@@ -48,6 +50,7 @@ export default function LoginScreen() {
   }, [response]);
   const login = async () => {
     setError("");
+    setInfo("");
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
@@ -59,11 +62,29 @@ export default function LoginScreen() {
   };
   const register = async () => {
     setError("");
+    setInfo("");
     setLoading(true);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
     } catch {
       setError("Compte deja existant ou mot de passe faible");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const resetPassword = async () => {
+    setError("");
+    setInfo("");
+    if (!email.trim()) {
+      setError("Entrez votre email pour reinitialiser le mot de passe");
+      return;
+    }
+    setLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, email.trim());
+      setInfo("Email de reinitialisation envoye");
+    } catch {
+      setError("Erreur lors de l'envoi de l'email");
     } finally {
       setLoading(false);
     }
@@ -144,6 +165,17 @@ export default function LoginScreen() {
           {error}
         </Text>
       )}
+      {info !== "" && (
+        <Text
+          style={{
+            color: theme.textMuted,
+            marginBottom: 10,
+            textAlign: "center",
+          }}
+        >
+          {info}
+        </Text>
+      )}
       <TextInput
         placeholder="Email"
         placeholderTextColor={theme.textMuted}
@@ -205,6 +237,11 @@ export default function LoginScreen() {
           >
             <Text style={{ color: theme.primary, textAlign: "center" }}>
               Creer un compte
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={resetPassword} style={{ marginBottom: 20 }}>
+            <Text style={{ color: theme.textMuted, textAlign: "center" }}>
+              Mot de passe oublie ?
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
